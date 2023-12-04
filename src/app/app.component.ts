@@ -18,10 +18,12 @@ export class AppComponent {
       this.showSplash = false;
       if (localStorage.getItem('token')) {
         this.toastr.success('Welcome Back')
-        this.router.navigate(['/tic-tac-toe']);
+        this.router.navigate(['/Users']);
       }
       else {
         this.router.navigate(['/login']);
+        // this.router.navigate(['/Users']);
+
       }
     }, 6800);
   }

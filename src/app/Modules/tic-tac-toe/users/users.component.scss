@@ -1,0 +1,28 @@
+/* Add this to your styles.scss or styles.css file */
+
+/* Style for the users table */
+.users-table {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .users-table th,
+  .users-table td {
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .users-table th {
+    background-color: #007bff;
+    color: #ffffff;
+  }
+  
+  .users-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .users-table tbody tr:hover {
+    background-color: #e0e0e0;
+    transition: background-color 0.3s ease;
+  }
+  

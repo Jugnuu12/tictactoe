@@ -35,16 +35,16 @@ export class TicTacToeComponent {
   history: { player: string, index: number, move: 'x' | 'o', winner?: string }[] = [];
 
   winner: string | undefined = '';
-  winSomeOne = false; 
+  winSomeOne = false;
 
-  constructor(private gameService: GameService, private route: ActivatedRoute){
+  constructor(private gameService: GameService, private route: ActivatedRoute) {
 
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.checkRoute()
   }
-  checkRoute(){
+  checkRoute() {
     this.route.snapshot.url[0]?.path === 'tic-tac-toe';
   }
   move(index: number, player: Player) {
@@ -79,7 +79,7 @@ export class TicTacToeComponent {
 
   restartGame() {
     this.winner = '';
-    this.winSomeOne = false; 
+    this.winSomeOne = false;
     this.player1 = new Player('Bibi');
     this.player2 = new Player('Ganz');
     this.board = [null, null, null, null, null, null, null, null, null];

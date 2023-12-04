@@ -24,7 +24,7 @@ export class LoginComponent {
           this.toastr.success('Login Successfully', 'Have fun!');
           localStorage.setItem('token', response.token);
           localStorage.setItem('userData', JSON.stringify(response.userData));
-          this.route.navigate(['/tic-tac-toe']);
+          this.route.navigate(['/Users']);
         }
         else {
           this.toastr.error('Login not Successful', 'Try Again');
@@ -41,5 +41,4 @@ export class LoginComponent {
       password: this.userData.password
     }
   }
-
 }
