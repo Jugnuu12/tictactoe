@@ -1,6 +1,6 @@
 import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import {FilterPipe} from '../../../pipes/filter.pipe'
-
+import {SignalrService} from '../../../Services/signalr.service'
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -101,7 +101,7 @@ export class ChatComponent {
   ];
   newMessage: string = '';
 
-  constructor(private renderer: Renderer2) {}
+  constructor(private SignalrService: SignalrService, private renderer: Renderer2) {}
 
   sendMessage() {
     if (this.newMessage.trim() !== '') {
@@ -129,6 +129,7 @@ export class ChatComponent {
   arrowFun(){
     this.showMwssageDetail = !this.showMwssageDetail
   }
+ 
 }
 export interface ChatMessage {
   username: string;
