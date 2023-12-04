@@ -22,7 +22,7 @@ export class UsersComponent {
       .build();
   }
   async ngOnInit(): Promise<void> {
-    this.GetAllusers()
+   this.GetAllusers()
     // Call the API service function when the app component initializes
     try {
       await this.startSignalRConnection();
@@ -55,7 +55,6 @@ export class UsersComponent {
     console.log("page is closed");
   }
 
-  //
   GetAllusers() {
     this.UsersSerServ.getAllUsers().subscribe(
       (response : any) => {
@@ -67,8 +66,13 @@ export class UsersComponent {
         }
       },
       (error) => {
-        console.log('error')
+        this.toastr.error('Error While Players Loading', 'Try Again');
       }
     )
   }
+  //send
+  sendRequest(userId : any){
+    this.signalRService.sendReqForGame(userId)
+  }
+  
 }

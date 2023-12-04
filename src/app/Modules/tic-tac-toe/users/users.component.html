@@ -1,4 +1,4 @@
-<div class="container">
+<div class="ps-4 pe-4">
     <div class="row">
       <!-- Users List (75%) -->
       <div class="col-md-9">
@@ -19,13 +19,13 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.userName }}</td>
                 <td>{{ user.location }}</td>
-                <td><button class="btn btn-success">Request User</button></td>
+                <td><button class="btn btn-success" (click)="sendRequest(user.id)">Request User</button></td>
               </tr>
             </tbody>
           </table>
         </div>
         <ng-template #noUsers>
-          <p>No users available.</p>
+          <p class="no-user">No users available.</p>
         </ng-template>
       </div>
   

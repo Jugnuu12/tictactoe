@@ -10,7 +10,7 @@ export class AppComponent {
 
   showSplash: boolean = true;
 
-  constructor(private toastr: ToastrService,private router: Router) {
+  constructor(private toastr: ToastrService, private router: Router) {
 
   }
   ngOnInit() {

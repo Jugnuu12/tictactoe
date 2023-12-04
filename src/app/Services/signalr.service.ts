@@ -8,6 +8,7 @@ export class SignalrService {
   private hubConnection: signalR.HubConnection;
   userInfo: any;
   constructor() {
+    this.userInfo = localStorage.getItem('userData')
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('http://localhost:5041/mailHub', {
         skipNegotiation: true,
@@ -27,10 +28,7 @@ export class SignalrService {
       //push that move to game arry
     });
   }
-  ngOnInit() {
-    this.userInfo = localStorage.getItem('userData')
-    debugger
-  }
+
   async startSignalRConnection(): Promise<void> {
 
     if (this.hubConnection.state === 'Disconnected') {
@@ -82,8 +80,11 @@ export class SignalrService {
   }
   //snd req for game
   sendReqForGame(ToUserId: any) {
-    this.hubConnection.invoke('CreateGameBoard', this.userInfo.id.toString(), this.userInfo.username, ToUserId); //fromname is current logedin user
-  }
+    const userObject = JSON.parse(this.userInfo);
+    const userId = userObject.id;
+    this.hubConnection.invoke('CreateGameBoard', userId.toString(), this.userInfo?.username, ToUserId);
+}
+
   AcceptOrReject(GameId: any, Status: any) {
     this.hubConnection.invoke('AcceptOrReject', GameId, Status)
   }
