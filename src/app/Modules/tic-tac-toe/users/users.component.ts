@@ -15,11 +15,11 @@ export class UsersComponent {
 
     //SignalR
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5261/mailHub', {
+      .withUrl('http://localhost:5041/mailHub', {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
       })
-      .build();
+      .build()
   }
   async ngOnInit(): Promise<void> {
    this.GetAllusers()

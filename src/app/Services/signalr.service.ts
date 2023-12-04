@@ -7,7 +7,13 @@ import * as signalR from '@microsoft/signalr';
 export class SignalrService {
   private hubConnection: signalR.HubConnection;
   userInfo: any;
+  userId : any;
+  userName : any;
+
   constructor() {
+    const userObject = JSON.parse(this.userInfo);
+    this.userId = userObject.id;
+    this.userName = userObject.userName;
     this.userInfo = localStorage.getItem('userData')
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('http://localhost:5041/mailHub', {
@@ -17,7 +23,8 @@ export class SignalrService {
     this.startSignalRConnection();
 
     //this functions is called from backend
-    this.hubConnection.on('ReceiveGameReq', (GameID: any, opponantUserId: any) => {
+    this.hubConnection.on('ReceiveGameReq', (notification:any,GameID: any, opponantUserId: any) => {
+      console.log("ReceiveGameReq is called... "+ notification)
       //notifay current user about game req send by someone
     });
     this.hubConnection.on('GameReqStatusNotification', (gameId: any, GameStatus: any, aponanName: any, aponanUserId: any) => {
@@ -27,8 +34,20 @@ export class SignalrService {
     this.hubConnection.on('opponentMove', (board: any, playerName: any) => {
       //push that move to game arry
     });
-  }
 
+    //message
+    //await Clients.Client(Con).SendAsync("ReceivePrivateMessage", messageResult.messageID, messageResult.message, messageResult.chatId, messageResult.senderID, messageResult.date);
+    this.hubConnection.on('ReceivePrivateMessage', ( messageID:any, message:any, chatId:any, senderID:any, date:any) => {
+      //push this param to chat-->messages 
+    });
+    //await Clients.Caller.SendAsync("SendMeasseNotifayMe", "Message has been Sent",  messageResult.messageID, messageResult.message, messageResult.chatId, messageResult.senderID, messageResult.date);
+    this.hubConnection.on('SendMeasseNotifayMe', ( StatusMessage:any,messageID:any, message:any, chatId:any, senderID:any, date:any) => {
+      //push this param to chat-->messages 
+    });
+  }
+  ngOnInit(){
+  
+  }
   async startSignalRConnection(): Promise<void> {
 
     if (this.hubConnection.state === 'Disconnected') {
@@ -52,7 +71,11 @@ export class SignalrService {
     this.startSignalRConnection();
     // console.log('User-Agent:', userAgent);
     if (this.hubConnection.state === 'Connected') {
-      this.hubConnection.invoke('OpenNewPage', this.userInfo.id.toString(), this.userInfo.username, brwserInfo.toString()).catch((error) => {
+      const userObject = JSON.parse(this.userInfo);
+      const userId = userObject.id;
+      const userName = userObject.username;
+   //its wokring now
+      this.hubConnection.invoke('OpenNewPage', userId.toString(),userName, brwserInfo.toString()).catch((error) => {
         console.error('Error JoinPrivateChat:', error);
       });
     } else {
@@ -60,16 +83,20 @@ export class SignalrService {
     }
   }
   leavePage(): void {
-
+    const userObject = JSON.parse(this.userInfo);
+    const userId = userObject.id;
+    const userName = userObject.username;
     const brwserInfo = navigator.userAgent;
     // console.log('User-Agent:', userAgent);
-    this.hubConnection.invoke('LeavePage', this.userInfo.id.toString());
+    this.hubConnection.invoke('LeavePage', userId.toString());
   }
   logOut() {
     const brwserInfo = navigator.userAgent;
+    const userObject = JSON.parse(this.userInfo);
+    const userId = userObject.id;
     // console.log('User-Agent:', userAgent);
     if (this.hubConnection.state === 'Connected') {
-      this.hubConnection.invoke('LeaveApplication', this.userInfo.id.toString(), brwserInfo.toString()).catch((error) => {
+      this.hubConnection.invoke('LeaveApplication', userId.toString(), brwserInfo.toString()).catch((error) => {
         console.error('Error JoinPrivateChat:', error);
       });
     } else {
@@ -80,16 +107,40 @@ export class SignalrService {
   }
   //snd req for game
   sendReqForGame(ToUserId: any) {
-    const userObject = JSON.parse(this.userInfo);
-    const userId = userObject.id;
-    this.hubConnection.invoke('CreateGameBoard', userId.toString(), this.userInfo?.username, ToUserId);
+    this.hubConnection.invoke('CreateGameBoard', this.userId, this.userName, ToUserId)
 }
 
   AcceptOrReject(GameId: any, Status: any) {
     this.hubConnection.invoke('AcceptOrReject', GameId, Status)
   }
   myGameMove(board: any, playerName: any, CUrrentUserid: any, OpponantUserId: any) {
-    this.hubConnection.invoke('GameMove', board, playerName, CUrrentUserid, OpponantUserId)
+    const userObject = JSON.parse(this.userInfo);
+    const userId = userObject.id;
+    const userName = userObject.userName;
+    this.hubConnection.invoke('GameMove', board, playerName, userId, OpponantUserId)
   }
 
+
+  //mesage
+  SendPrivateMessage(recipientUserId:any,message:any): void {  //recipientUserId is int 
+    if(message.trim()=="" || message.trim() ==null ){
+      return
+    }
+      // Ensure that the connection is in the 'Connected' state before sending the message
+      if (this.hubConnection.state === 'Connected') {
+
+        // Call a server-side hub method to send the private message
+        this.hubConnection.invoke('SendPrivateMessage', this.userInfo.id,recipientUserId,message)
+          .catch((error) => {
+            console.error('Error sending private message:', error);
+          });
+      } else {
+        console.error('SignalR connection is not in the "Connected" state.');
+      }
+
+    }
+
+    //getMyChats --> api all chats
+
+    //GetMessages--> api for messages against chat id
 }
