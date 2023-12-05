@@ -5,18 +5,10 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class TictactoeserService {
-  private opponentdata = new Subject<any>();
-  public opponent$ = this.opponentdata.asObservable();
-
-  private mydatas = new Subject<any>();
-  public mydata$ = this.mydatas.asObservable();
-
-  constructor() { }
-  opponentData(routesdata: any) {
-    this.opponentdata.next(routesdata);
-  }
+  private OpponentMove = new Subject<any>();
+  public opponentMove$ = this.OpponentMove.asObservable();
 
   myData(myd: any) {
-    this.mydatas.next(myd);
+    this.OpponentMove.next(myd);
   }
 }
