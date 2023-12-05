@@ -17,7 +17,7 @@ export class SignalrService {
     { username: '', text: '!', isCurrentUser: false },
 
   ];
-  constructor(private connectionser: ConnectionserService) {
+  
   constructor(private tictactoe: TictactoeserService, private connectionser: ConnectionserService) {
     this.userInfo = localStorage.getItem('userData');
     const userObject = JSON.parse(this.userInfo);
