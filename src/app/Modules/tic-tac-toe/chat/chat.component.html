@@ -10,14 +10,14 @@
     </div>
     <div class="total-messages scroller" #messageContainer>
        <div>
-        <div *ngFor="let message of messages" class="message "
+        <div *ngFor="let message of SignalrService_.messages" class="message "
         [ngClass]="{'user-message': message.isCurrentUser, 'incoming-message': !message.isCurrentUser}">
         {{ message.text }}
     </div>
        </div>
     </div>
 
-    <div *ngIf="showMwssageDetail" class="input-container">
+    <div  class="input-container">
         <input type="text" placeholder="Type your message..." [(ngModel)]="newMessage" />
         <button (click)="sendMessage()" class="send-button">Send</button>
     </div>

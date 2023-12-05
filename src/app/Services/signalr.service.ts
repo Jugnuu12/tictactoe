@@ -12,7 +12,10 @@ export class SignalrService {
   userName: any;
   notification: any;
   gameId: any;
+ public messages = [
+    { username: '', text: '!', isCurrentUser: false },
 
+  ];
   constructor(private connectionser: ConnectionserService) {
     this.userInfo = localStorage.getItem('userData');
     const userObject = JSON.parse(this.userInfo);
@@ -60,12 +63,17 @@ export class SignalrService {
 
     //message
     //await Clients.Client(Con).SendAsync("ReceivePrivateMessage", messageResult.messageID, messageResult.message, messageResult.chatId, messageResult.senderID, messageResult.date);
-    this.hubConnection.on('ReceivePrivateMessage', (messageID: any, message: any, chatId: any, senderID: any, date: any) => {
-      //push this param to chat-->messages 
+    this.hubConnection.on('ReceivePrivateMessage', (message: any) => {
+      //push this param to chat-->messages
+    debugger
+      this.messages.push({ username: 'You', text: message, isCurrentUser: false });
+      
     });
     //await Clients.Caller.SendAsync("SendMeasseNotifayMe", "Message has been Sent",  messageResult.messageID, messageResult.message, messageResult.chatId, messageResult.senderID, messageResult.date);
-    this.hubConnection.on('SendMeasseNotifayMe', (StatusMessage: any, messageID: any, message: any, chatId: any, senderID: any, date: any) => {
+    this.hubConnection.on('SendMeasseNotifayMe', (message: any) => {
       //push this param to chat-->messages 
+      debugger
+      this.messages.push({ username: 'opponant', text: message, isCurrentUser: true });
     });
   }
   ngOnInit() {
@@ -147,6 +155,9 @@ export class SignalrService {
 
   //mesage
   SendPrivateMessage(recipientUserId: any, message: any): void {  //recipientUserId is int 
+    debugger;
+    const userObject = JSON.parse(this.userInfo);
+    const userId = userObject.id;
     if (message.trim() == "" || message.trim() == null) {
       return
     }
@@ -154,7 +165,7 @@ export class SignalrService {
     if (this.hubConnection.state === 'Connected') {
 
       // Call a server-side hub method to send the private message
-      this.hubConnection.invoke('SendPrivateMessage', this.userInfo.id, recipientUserId, message)
+      this.hubConnection.invoke('SendPrivateMessage', userId, recipientUserId, message)
         .catch((error) => {
           console.error('Error sending private message:', error);
         });
