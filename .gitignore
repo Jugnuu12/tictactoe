@@ -40,3 +40,11 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+/.vs/stepper/FileContentIndex/e77ba627-9c59-4d38-92e5-cda2eed1a52e.vsidx
+/.vs/stepper/v17/.wsuo
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/stepper/FileContentIndex/8efb7d61-b92b-4c76-ab4c-1e7ec6af23a1.vsidx
+/.vs/stepper/FileContentIndex/8277b4ca-7913-46ef-a2b9-4b6b9eb50114.vsidx
+/.vs/stepper/FileContentIndex/e6287c29-596a-4e15-884c-e02dc1339b9f.vsidx
+/.vs/VSWorkspaceState.json
