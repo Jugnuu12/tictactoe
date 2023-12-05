@@ -157,8 +157,8 @@ export class SignalrService {
 
 
   //mesage
-  SendPrivateMessage(recipientUserId: any, message: any): void {  //recipientUserId is int 
-    debugger;
+  SendPrivateMessage(recipientUserId: any, message: any): void {
+    debugger
     const userObject = JSON.parse(this.userInfo);
     const userId = userObject.id;
     if (message.trim() == "" || message.trim() == null) {

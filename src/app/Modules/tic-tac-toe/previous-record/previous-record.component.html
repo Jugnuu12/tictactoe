@@ -1,13 +1,15 @@
 <!-- previous-records.component.html -->
-<div *ngIf="history.length > 0">
-  <h2>Game Board</h2>
-  <div class="game-board">
-    <div *ngFor="let move of history[history.length - 1].board; let i = index" class="board-cell">
-      {{ move }}
+<div *ngIf="history.length > 0" class="center-container">
+  <div class="records-container">
+    <h2>Game Board</h2>
+    <div class="game-board">
+      <div *ngFor="let move of history[history.length - 1].board; let i = index" class="board-cell">
+        {{ move }}
+      </div>
     </div>
-  </div>
 
-  <div *ngIf="history[history.length - 1].winner">
-    <h3>Winner: {{ history[history.length - 1].winner }}</h3>
+    <div *ngIf="history[history.length - 1].winner" class="winner-section">
+      <h3>Winner: {{ history[history.length - 1].winner }}</h3>
+    </div>
   </div>
 </div>

@@ -29,8 +29,8 @@ const winStates = [
   styleUrls: ['./tic-tac-toe.component.scss']
 })
 export class TicTacToeComponent {
-  player1 = new Player('Bibi');
-  player2 = new Player('Ganz');
+  player1 = new Player('');
+  player2 = new Player('');
   moveCounter = 0;
   currnetPlayer = this.player1;
   board: (null | "x" | "o")[] = [null, null, null, null, null, null, null, null, null];
@@ -47,6 +47,7 @@ export class TicTacToeComponent {
   myName: any;
   myId: any;
   opponentName: any;
+  isLocalPlayerTurn: boolean =false;
 
   constructor(private tictactoeser: TictactoeserService, private SignalrService: SignalrService, private gameService: GameService, private route: ActivatedRoute) {
   this.tictactoeser.opponentMove$.subscribe(
@@ -68,16 +69,15 @@ export class TicTacToeComponent {
   
     // Set player names
     this.player1.name = this.userInfo.myName;
-    this.player2.name = this.opponentInfo.opponentName;
-  
-
+    this.player2.name = this.opponentInfo.Opponentname;
   }
 
   move(index: number, player: Player) {
-    if (this.player1.state[index] === 0 && this.player2.state[index] === 0) {
+    if (!this.board[index]) { // Check if the square is not already occupied
+      const moveSymbol = this.calculateMoveSymbol();
+
       player.state[index] = 1;
       this.moveCounter++;
-      const moveSymbol = this.currnetPlayer === this.player1 ? 'x' : 'o';
       this.board[index] = moveSymbol;
 
       this.SignalrService.myGameMove([...this.board], player.name, this.userInfo.myId.toString(), this.opponentInfo.opponentid);
@@ -86,10 +86,15 @@ export class TicTacToeComponent {
       if (this.moveCounter > 4) {
         this.checkWin(this.currnetPlayer);
       }
-      this.currnetPlayer = this.switchCurrentPlayer();
     } else {
-      alert("can't move");
+      alert("Can't move, the square is already occupied.");
     }
+  }
+
+  calculateMoveSymbol(): 'x' | 'o' {
+    // Calculate the move symbol based on the number of existing moves on the board
+    const count = this.board.filter(square => square !== null).length;
+    return count % 2 === 0 ? 'x' : 'o';
   }
 
   switchCurrentPlayer() {

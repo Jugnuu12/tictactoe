@@ -17,6 +17,8 @@ export class ChatComponent {
   ];
   private hubConnection: signalR.HubConnection;
   newMessage: string = '';
+  userInfo: any;
+  opponentInfo: any;
 
   constructor(public SignalrService_: SignalrService, private renderer: Renderer2) {
     
@@ -39,12 +41,18 @@ export class ChatComponent {
     } else {
       console.warn('SignalR connection is already in a connected or connecting state.');
     }
+
+  
+  }
+  ngOnInit(){
+    const opponentDataString = sessionStorage.getItem('OpponentData');
+    this.opponentInfo = JSON.parse(opponentDataString || '{}');
   }
 
   sendMessage() {
     if (this.newMessage.trim() !== '') {
 
-      this.SignalrService_.SendPrivateMessage(6,this.newMessage); //replace the 6 with opanant id
+      this.SignalrService_.SendPrivateMessage(this.opponentInfo.opponentid,this.newMessage); //replace the 6 with opanant id
       // Use setTimeout to wait for DOM update before scrolling
       setTimeout(() => {
         this.scrollToBottom();

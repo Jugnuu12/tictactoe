@@ -10,8 +10,6 @@ export class PreviousRecordComponent {
   history: { player: string, board: (null | "x" | "o")[], winner?: string }[] = [];
   constructor(private gameService: GameService) { }
   ngOnInit() {
-    // Retrieve the history from the game service
     this.history = this.gameService.getHistory();
-    debugger
   }
 }
