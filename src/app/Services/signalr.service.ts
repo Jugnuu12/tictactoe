@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { ConnectionserService } from '../Modules/tic-tac-toe/users/connectionser.service';
+import { TictactoeserService } from '../Modules/tic-tac-toe/tic-tac-toe/tictactoeser.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -17,6 +18,7 @@ export class SignalrService {
 
   ];
   constructor(private connectionser: ConnectionserService) {
+  constructor(private tictactoe: TictactoeserService, private connectionser: ConnectionserService) {
     this.userInfo = localStorage.getItem('userData');
     const userObject = JSON.parse(this.userInfo);
     this.userId = userObject.id;
@@ -58,7 +60,11 @@ export class SignalrService {
       }
     );
     this.hubConnection.on('opponentMove', (board: any, playerName: any) => {
-      //push that move to game arry
+      const data = {
+        board : board,
+        playerName : playerName
+      }
+      this.tictactoe.myData(data)
     });
 
     //message
@@ -146,10 +152,7 @@ export class SignalrService {
   }
   
   myGameMove(board: any, playerName: any, CUrrentUserid: any, OpponantUserId: any) {
-    const userObject = JSON.parse(this.userInfo);
-    const userId = userObject.id;
-    const userName = userObject.userName;
-    this.hubConnection.invoke('GameMove', board, playerName, userId, OpponantUserId)
+    this.hubConnection.invoke('GameMove', board, playerName, CUrrentUserid, OpponantUserId)
   }
 
 
