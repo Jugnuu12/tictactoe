@@ -102,14 +102,20 @@ export class TicTacToeComponent {
   }
 
   checkWin(player: Player) {
-    winStates.map(state => {
-      const res = state.map((currElement, index) => {
-        return player.state[index] * currElement;
-      })
-      if (state.toString().includes(res.toString())) {
-        this.endGame(player);
+    for (const state of winStates) {
+      let count = 0;
+
+      for (let i = 0; i < state.length; i++) {
+        if (player.state[i] === 1 && state[i] === 1) {
+          count++;
+        }
       }
-    })
+
+      if (count === 3) {
+        this.endGame(player);
+        break;
+      }
+    }
   }
 
   restartGame() {
