@@ -34,11 +34,16 @@
       <h2>Requests Notification</h2>
       <div class="d-flex gap-2 justify-content-around">
         <div>
-          <p>{{ notification }}</p>
+          <p>{{ notification.notification }}</p>
         </div>
-        <div class="d-flex gap-3" *ngIf="notification">
-          <button class="btn btn-success" (click)="AnswerToRequest(gameId, 'Accepted')">Accept</button>
-          <button class="btn btn-danger" (click)="AnswerToRequest(gameId , 'Rejected')">Reject</button>
+        <div class="d-flex gap-3" *ngIf="notification.notification ">
+          <button class="btn btn-success" (click)="AnswerToRequest(notification.gameId, true)">Accept</button>
+          <button class="btn btn-danger" (click)="AnswerToRequest(notification.gameId , false)">Reject</button>
+        </div>
+      </div>
+      <div *ngIf="gameStatus?.GameStatus">
+        <div>
+          <span>{{gameStatus.aponanName}}</span> <span>{{gameStatus.GameStatus}}</span> <span> your game request</span>
         </div>
       </div>
     </div>

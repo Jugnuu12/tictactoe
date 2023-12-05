@@ -3,6 +3,7 @@ import { GameService } from 'src/app/Services/game.service';
 import { ActivatedRoute } from '@angular/router';
 import * as signalR from '@microsoft/signalr';
 import { SignalrService } from '../../../Services/signalr.service'
+import { TictactoeserService } from './tictactoeser.service';
 class Player {
   state: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
   name: string;
@@ -41,68 +42,33 @@ export class TicTacToeComponent {
   gameId: any;
   aponanUserId: any;
   aponanName: any;
-  private hubConnection: signalR.HubConnection;
+  opponentInfo: any;
+  myInfo: any;
 
-  constructor(private SignalrService: SignalrService, private gameService: GameService, private route: ActivatedRoute) {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5041/mailHub', {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
-      })
-      .build();
+  constructor(private tictactoeser: TictactoeserService, private SignalrService: SignalrService, private gameService: GameService, private route: ActivatedRoute) {
+    this.tictactoeser.opponent$.subscribe(
+      (notification) => {
+        console.log('Opponent info received:', notification);
+        this.opponentInfo = notification || {};
+        // Place any additional logic related to opponentInfo here
+      }
+    );
 
+    this.tictactoeser.mydata$.subscribe(
+      (notification) => {
+        console.log('My info received:', notification);
+        this.myInfo = notification || {};
+        // Place any additional logic related to myInfo here
+      }
+    );
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      // Retrieve values from route parameters
-      this.gameId = params['gameId'];
-      this.aponanUserId = params['aponanUserId'];
-      this.aponanName = params['aponanName'];
-
-      console.log('Game ID:', this.gameId);
-      console.log('Aponan User ID:', this.aponanUserId);
-      console.log('Aponan Name:', this.aponanName);
-    });
-    this.checkRoute()
     this.userInfo = localStorage.getItem('userData');
     this.userInfo = JSON.parse(this.userInfo);
-    this.startSignalRConnection();
-
   }
 
-  ngOnDestroy(): void {
-    // Ensure to stop the connection when the component is destroyed
-    if (this.hubConnection) {
-      this.hubConnection.stop();
-    }
-  }
-  async startSignalRConnection(): Promise<void> {
-    if (this.hubConnection.state === 'Disconnected') {
-      await this.hubConnection
-        .start()
-        .then(() => {
-          console.log('SignalR connection started successfully.');
-          // Implement any logic you need after a successful connection
-        })
-        .catch((error) => {
-          console.error('Error starting SignalR connection:', error);
-          throw error; // Propagate the error
-        });
-    } else {
-      console.warn(
-        'SignalR connection is already in a connected or connecting state.'
-      );
-    }
-    this.hubConnection.on('opponentMove', (board: any, playerName: any) => {
-      this.board = board;
-    });
 
-  }
-
-  checkRoute() {
-    this.route.snapshot.url[0]?.path === 'tic-tac-toe';
-  }
   move(index: number, player: Player) {
     if (this.player1.state[index] === 0 && this.player2.state[index] === 0) {
       player.state[index] = 1;

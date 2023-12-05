@@ -7,22 +7,8 @@
         <div *ngIf="!showMwssageDetail">
             <img src="../../../../assets/images/defa.png" style="border-radius: 50%;">
         </div>
-        <div>search</div>
     </div>
-    <div *ngIf="!showMwssageDetail" class="user-list">
-        <!-- *ngFor="let user of messagess | filterSearch : searchTerm" -->
-        <div  *ngFor="let user of messagess" class="user-item" (click)="openChat(user)">
-            <img [src]="user.imageUrl" alt="{{ user.username }}" />
-            <div class="user-details">
-                <h5>{{ user.username }}</h5>
-                <p class="mb-0">{{ user.lastMessage }}</p>
-                <p *ngIf="user.onlineStatus" class="online">Online</p>
-                <p *ngIf="!user.onlineStatus" class="offline">Offline</p>
-            </div>
-            <p class="time">{{ user.time }}</p>
-        </div>
-    </div>
-    <div *ngIf="showMwssageDetail" class="total-messages scroller" #messageContainer>
+    <div class="total-messages scroller" #messageContainer>
        <div>
         <div *ngFor="let message of messages" class="message "
         [ngClass]="{'user-message': message.isCurrentUser, 'incoming-message': !message.isCurrentUser}">

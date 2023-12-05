@@ -1,10 +1,11 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy } from '@angular/core';
 import { SignalrService } from 'src/app/Services/signalr.service';
 import * as signalR from '@microsoft/signalr';
 import { UsersSerService } from './users-ser.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
+import { ConnectionserService } from './connectionser.service'
+import { TictactoeserService } from '../tic-tac-toe/tictactoeser.service'
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
@@ -12,16 +13,20 @@ import { Router } from '@angular/router';
 })
 export class UsersComponent implements OnDestroy {
   users: any;
-  notification: string = '';
+  notification: any;
   gameId: any;
 
   private hubConnection: signalR.HubConnection;
+  gameStatus: any;
 
   constructor(
+    private TictactoeserService: TictactoeserService,
+    private ConnectionserService: ConnectionserService,
     private toastr: ToastrService,
     private UsersSerServ: UsersSerService,
     private signalRService: SignalrService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     // SignalR
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -30,13 +35,46 @@ export class UsersComponent implements OnDestroy {
         transport: signalR.HttpTransportType.WebSockets,
       })
       .build();
+
+    this.notification = this.ConnectionserService.notification$.subscribe(
+      (notification) => {
+        this.notification = notification;
+      }
+    );
+    this.ConnectionserService.gameStatus$.subscribe((gameStatus) => {
+      if (gameStatus.GameStatus == "Accepted") {
+        this.toastr.success(gameStatus.aponanName, " Accepted Your request");
+        this.gameStatus = gameStatus;
+        const data = {
+          gameid: gameStatus.gameId,
+          Opponentname: gameStatus.aponanName,
+          opponentid: gameStatus.aponanUserId
+        }
+        this.TictactoeserService.opponentData(data)
+        setTimeout(() => {
+          this.gameStatus = null;
+          this.router.navigate(['/tic-tac-toe']);
+        }, 5000);
+      } else if (gameStatus.GameStatus == "Rejected") {
+        this.gameStatus = gameStatus;
+        this.toastr.error(gameStatus.aponanName, " Rejected Your request");
+        setTimeout(() => {
+          this.gameStatus = null;
+        }, 5000);
+      }
+    });
   }
-
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.GetAllusers();
-
     // Call the API service function when the app component initializes
-    this.startSignalRConnection();
+    try {
+      await this.startSignalRConnection();
+      this.signalRService.openNewPage();
+      console.log("openNewPage is called");
+    } catch (error) {
+      console.error('Error starting SignalR connection:', error);
+      // Handle connection startup errors here
+    }
   }
 
   ngOnDestroy(): void {
@@ -63,30 +101,6 @@ export class UsersComponent implements OnDestroy {
         'SignalR connection is already in a connected or connecting state.'
       );
     }
-
-    // Listen for game requests
-    this.hubConnection.on(
-      'ReceiveGameReq',
-      (notification: any, GameID: any, opponantUserId: any) => {
-        console.log('ReceiveGameReq is called... ' + notification);
-        this.notification = notification;
-        this.gameId = GameID;
-      }
-    );
-
-    this.hubConnection.on(
-      'GameReqStatusNotification',
-      (gameId: any, GameStatus: any, aponanName: any, aponanUserId: any) => {
-        if (GameStatus == 'Accepted') {
-          this.notification = `Game request accepted by ${aponanName}. Redirecting to the game...`;
-          setTimeout(() => {
-            this.router.navigate(['/tic-tac-toe', gameId ,aponanUserId,aponanName]);
-          }, 5000);
-        } else if (GameStatus == 'Rejected') {
-          this.notification = `Game request rejected by ${aponanName}.`;
-        }
-      }
-    );
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -109,14 +123,25 @@ export class UsersComponent implements OnDestroy {
       }
     );
   }
-
   // send
   sendRequest(userId: any) {
     this.signalRService.sendReqForGame(userId);
   }
 
   // answer
-  AnswerToRequest(id: any, status: any) {
+  AnswerToRequest(id: any, status: boolean) {
+    const userDataString = localStorage.getItem('userData');
+    const userInfo = userDataString ? JSON.parse(userDataString) : null;
+    const data = {
+      gameid: id,
+      myName: userInfo.userName,
+      myId: userInfo.id,
+    };
+    setTimeout(() => {
+      this.TictactoeserService.myData(data)
+      this.router.navigate(['/tic-tac-toe']);
+    }, 5000);
     this.signalRService.AcceptOrReject(id, status);
   }
+
 }

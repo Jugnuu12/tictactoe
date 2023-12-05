@@ -16,4 +16,5 @@ export class UsersSerService {
     const model = '';
     return this.http.post<HttpResponse<any>>(this.ConstantSer.getAllPlayers, model, { headers });
   }
+
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
+import { ConnectionserService } from '../Modules/tic-tac-toe/users/connectionser.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -9,8 +10,10 @@ export class SignalrService {
   userInfo: any;
   userId: any;
   userName: any;
+  notification: any;
+  gameId: any;
 
-  constructor() {
+  constructor(private connectionser: ConnectionserService) {
     this.userInfo = localStorage.getItem('userData');
     const userObject = JSON.parse(this.userInfo);
     this.userId = userObject.id;
@@ -23,15 +26,34 @@ export class SignalrService {
     this.startSignalRConnection();
 
     // this functions is called from backend
-    this.hubConnection.on('ReceiveGameReq', (notification: any, GameID: any, opponantUserId: any) => {
-      console.log("ReceiveGameReq is called... " + notification)
-      debugger
-      //notifay current user about game req send by someone
-    });
-    this.hubConnection.on('GameReqStatusNotification', (gameId: any, GameStatus: any, aponanName: any, aponanUserId: any) => {
-      // accept ---> navigation to gamebord
-      // rejact --> notifay that req is rejacted
-    });
+
+    // // Listen for game requests
+    this.hubConnection.on(
+      'ReceiveGameReq',
+      (notification: any, GameID: any, opponantUserId: any) => {
+        console.log('ReceiveGameReq is called... ' + notification);
+        const data = {
+          gameId: GameID,
+          notification: notification,
+          opponent: opponantUserId
+        }
+        this.connectionser.sendNotification(data)
+
+      }
+    );
+
+    this.hubConnection.on(
+      'GameReqStatusNotification',
+      (gameId: any, GameStatus: any, aponanName: any, aponanUserId: any) => {
+        const data ={
+          gameId :gameId,
+          GameStatus: GameStatus,
+          aponanName:aponanName,
+          aponanUserId:aponanUserId
+        }
+        this.connectionser.gameStatus(data)
+      }
+    );
     this.hubConnection.on('opponentMove', (board: any, playerName: any) => {
       //push that move to game arry
     });
@@ -111,9 +133,10 @@ export class SignalrService {
     this.hubConnection.invoke('CreateGameBoard', this.userId, this.userName, ToUserId)
   }
 
-  AcceptOrReject(GameId: any, Status: any) {
+  AcceptOrReject(GameId: any, Status: boolean) {
     this.hubConnection.invoke('AcceptOrReject', GameId, Status)
   }
+  
   myGameMove(board: any, playerName: any, CUrrentUserid: any, OpponantUserId: any) {
     const userObject = JSON.parse(this.userInfo);
     const userId = userObject.id;

@@ -14,6 +14,7 @@ import { UsersComponent } from './users/users.component';
     PreviousRecordComponent,
     ChatComponent,
     UsersComponent,
+    
   ],
   imports: [
     CommonModule,
