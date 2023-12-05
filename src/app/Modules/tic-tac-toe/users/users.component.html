@@ -37,8 +37,8 @@
           <p>{{ notification.notification }}</p>
         </div>
         <div class="d-flex gap-3" *ngIf="notification.notification ">
-          <button class="btn btn-success" (click)="AnswerToRequest(notification.gameId, true)">Accept</button>
-          <button class="btn btn-danger" (click)="AnswerToRequest(notification.gameId , false)">Reject</button>
+          <button class="btn btn-success" (click)="AnswerToRequest(notification.gameId, true , notification.opponent,notification.aponanName)">Accept</button>
+          <button class="btn btn-danger" (click)="AnswerToRequest(notification.gameId , false, notification.opponent,notification.aponanName)">Reject</button>
         </div>
       </div>
       <div *ngIf="gameStatus?.GameStatus">
@@ -49,3 +49,4 @@
     </div>
   </div>
 </div>
+

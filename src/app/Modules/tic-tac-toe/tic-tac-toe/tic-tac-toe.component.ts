@@ -44,30 +44,34 @@ export class TicTacToeComponent {
   aponanName: any;
   opponentInfo: any;
   myInfo: any;
+  myName: any;
+  myId: any;
+  opponentName: any;
 
   constructor(private tictactoeser: TictactoeserService, private SignalrService: SignalrService, private gameService: GameService, private route: ActivatedRoute) {
-    this.tictactoeser.opponent$.subscribe(
-      (notification) => {
-        console.log('Opponent info received:', notification);
-        this.opponentInfo = notification || {};
-        // Place any additional logic related to opponentInfo here
-      }
-    );
-
-    this.tictactoeser.mydata$.subscribe(
-      (notification) => {
-        console.log('My info received:', notification);
-        this.myInfo = notification || {};
-        // Place any additional logic related to myInfo here
-      }
-    );
+  this.tictactoeser.opponentMove$.subscribe(
+    (res) =>{
+      
+      this.board = res.board
+    }
+  )
   }
 
   ngOnInit() {
-    this.userInfo = localStorage.getItem('userData');
-    this.userInfo = JSON.parse(this.userInfo);
-  }
+    // Retrieve stored data from sessionStorage
+    const myDataString = sessionStorage.getItem('myData');
+    const opponentDataString = sessionStorage.getItem('OpponentData');
+  
+    // Parse and assign values directly
+    this.userInfo = JSON.parse(myDataString || '{}');
+    this.opponentInfo = JSON.parse(opponentDataString || '{}');
+  
+    // Set player names
+    this.player1.name = this.userInfo.myName;
+    this.player2.name = this.opponentInfo.opponentName;
+  
 
+  }
 
   move(index: number, player: Player) {
     if (this.player1.state[index] === 0 && this.player2.state[index] === 0) {
@@ -75,7 +79,9 @@ export class TicTacToeComponent {
       this.moveCounter++;
       const moveSymbol = this.currnetPlayer === this.player1 ? 'x' : 'o';
       this.board[index] = moveSymbol;
-      this.SignalrService.myGameMove([...this.board], player.name, this.userInfo.id, this.aponanUserId)
+
+      this.SignalrService.myGameMove([...this.board], player.name, this.userInfo.myId.toString(), this.opponentInfo.opponentid);
+
       this.gameService.addMove(player.name, [...this.board], this.winner);
       if (this.moveCounter > 4) {
         this.checkWin(this.currnetPlayer);
@@ -85,6 +91,7 @@ export class TicTacToeComponent {
       alert("can't move");
     }
   }
+
   switchCurrentPlayer() {
     return this.currnetPlayer === this.player1 ? this.player2 : this.player1;
   }
@@ -103,8 +110,8 @@ export class TicTacToeComponent {
   restartGame() {
     this.winner = '';
     this.winSomeOne = false;
-    this.player1 = new Player('Bibi');
-    this.player2 = new Player('Ganz');
+    this.player1 = new Player(this.myName);
+    this.player2 = new Player(this.aponanName);
     this.board = [null, null, null, null, null, null, null, null, null];
     this.moveCounter = 0;
   }
@@ -113,6 +120,5 @@ export class TicTacToeComponent {
     this.winSomeOne = true;
     this.history[this.history.length - 1].winner = this.winner;
   }
-  //show the opponents move
 
 }

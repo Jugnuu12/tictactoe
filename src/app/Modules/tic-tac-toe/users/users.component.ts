@@ -20,7 +20,7 @@ export class UsersComponent implements OnDestroy {
   gameStatus: any;
 
   constructor(
-    private TictactoeserService: TictactoeserService,
+    private tictacsewr: TictactoeserService,
     private ConnectionserService: ConnectionserService,
     private toastr: ToastrService,
     private UsersSerServ: UsersSerService,
@@ -50,7 +50,22 @@ export class UsersComponent implements OnDestroy {
           Opponentname: gameStatus.aponanName,
           opponentid: gameStatus.aponanUserId
         }
-        this.TictactoeserService.opponentData(data)
+        sessionStorage.setItem('OpponentData', JSON.stringify(data));
+        //setting my data
+        const userDataString = localStorage.getItem('userData');
+        const userInfo = userDataString ? JSON.parse(userDataString) : null;
+
+        if (!userInfo) {
+          console.error("User information not available.");
+          return;
+        }
+        const mydata = {
+          gameid: gameStatus.gameId,
+          myName: userInfo.userName,
+          myId: userInfo.id,
+        };
+        sessionStorage.setItem('myData', JSON.stringify(mydata));
+        //
         setTimeout(() => {
           this.gameStatus = null;
           this.router.navigate(['/tic-tac-toe']);
@@ -129,19 +144,33 @@ export class UsersComponent implements OnDestroy {
   }
 
   // answer
-  AnswerToRequest(id: any, status: boolean) {
-    const userDataString = localStorage.getItem('userData');
-    const userInfo = userDataString ? JSON.parse(userDataString) : null;
-    const data = {
-      gameid: id,
-      myName: userInfo.userName,
-      myId: userInfo.id,
-    };
-    setTimeout(() => {
-      this.TictactoeserService.myData(data)
-      this.router.navigate(['/tic-tac-toe']);
-    }, 5000);
+  AnswerToRequest(id: any, status: boolean,opponentId : any,aponanName : any) {
+    if (status == true) {
+      const userDataString = localStorage.getItem('userData');
+      const userInfo = userDataString ? JSON.parse(userDataString) : null;
+
+      if (!userInfo) {
+        console.error("User information not available.");
+        return;
+      }
+      const data = {
+        gameid: id,
+        myName: userInfo.userName,
+        myId: userInfo.id,
+      };
+      const opponentData ={
+        gameid: id,
+        Opponentname: aponanName,
+        opponentid: opponentId,
+      }
+      sessionStorage.setItem('myData', JSON.stringify(data));
+      sessionStorage.setItem('OpponentData', JSON.stringify(opponentData));
+      setTimeout(() => {
+        this.router.navigate(['/tic-tac-toe']);
+      }, 5000);
+    }
     this.signalRService.AcceptOrReject(id, status);
   }
+
 
 }
