@@ -48,7 +48,7 @@ export class TicTacToeComponent {
   myId: any;
   opponentName: any;
   isLocalPlayerTurn: boolean =false;
-  showwinner: any;
+ 
   constructor(
     private tictactoeser: TictactoeserService,
     private SignalrService: SignalrService,
@@ -141,7 +141,4 @@ export class TicTacToeComponent {
     this.history[this.history.length - 1].winner = this.winner;
   }
 
-  ngOnDestroy(){
-    localStorage.removeItem('winner2')
-  }
 }
