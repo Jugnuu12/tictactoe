@@ -48,14 +48,21 @@ export class TicTacToeComponent {
   myId: any;
   opponentName: any;
   isLocalPlayerTurn: boolean =false;
-
-  constructor(private tictactoeser: TictactoeserService, private SignalrService: SignalrService, private gameService: GameService, private route: ActivatedRoute) {
-  this.tictactoeser.opponentMove$.subscribe(
-    (res) =>{
-      
-      this.board = res.board
-    }
-  )
+  showwinner: any;
+  constructor(
+    private tictactoeser: TictactoeserService,
+    private SignalrService: SignalrService,
+    private gameService: GameService,
+    private route: ActivatedRoute
+  ) {
+    this.tictactoeser.opponentMove$.subscribe((res) => {
+      this.board = res.board;
+    });
+    this.tictactoeser.gameWinner$.subscribe(
+      (res) =>{
+       this.winner = 'bacluck' + res + 'loss this game !'
+      }
+    )
   }
 
   ngOnInit() {
@@ -70,6 +77,7 @@ export class TicTacToeComponent {
     // Set player names
     this.player1.name = this.userInfo.myName;
     this.player2.name = this.opponentInfo.Opponentname;
+  
   }
 
   move(index: number, player: Player) {
@@ -127,9 +135,13 @@ export class TicTacToeComponent {
     this.moveCounter = 0;
   }
   endGame(player: Player) {
-    this.winner = player.name + ' Wins!';
+    this.SignalrService.broadcastWinner(player.name,this.userInfo.myId.toString(), this.opponentInfo.opponentid.toString())
+    this.winner= 'Congratulations' + player.name + 'win this game.'
     this.winSomeOne = true;
     this.history[this.history.length - 1].winner = this.winner;
   }
 
+  ngOnDestroy(){
+    localStorage.removeItem('winner2')
+  }
 }

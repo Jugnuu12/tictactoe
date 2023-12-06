@@ -3,10 +3,8 @@
         <h3>
             {{player1.name}} vs {{player2.name}}
         </h3>
-        <div class="winner-message">
-            <div>
-                {{ winner }}
-            </div>
+        <div class="winner-message" >
+            {{ winner }}
         </div>
         <div class="board">
             <div class="box" (click)="move(i, currnetPlayer)" *ngFor="let square of board; let i = index"

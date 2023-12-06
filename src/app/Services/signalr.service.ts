@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { ConnectionserService } from '../Modules/tic-tac-toe/users/connectionser.service';
 import { TictactoeserService } from '../Modules/tic-tac-toe/tic-tac-toe/tictactoeser.service';
+import { Observable, Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -17,7 +18,8 @@ export class SignalrService {
     { username: '', text: '!', isCurrentUser: false },
 
   ];
-  
+  private winnerBroadcastSubject = new Subject<{ winnerName: string, currentPlayerId: string, opponentId: string }>();
+
   constructor(private tictactoe: TictactoeserService, private connectionser: ConnectionserService) {
     this.userInfo = localStorage.getItem('userData');
     const userObject = JSON.parse(this.userInfo);
@@ -71,15 +73,17 @@ export class SignalrService {
     //await Clients.Client(Con).SendAsync("ReceivePrivateMessage", messageResult.messageID, messageResult.message, messageResult.chatId, messageResult.senderID, messageResult.date);
     this.hubConnection.on('ReceivePrivateMessage', (message: any) => {
       //push this param to chat-->messages
-    debugger
       this.messages.push({ username: 'You', text: message, isCurrentUser: false });
       
     });
     //await Clients.Caller.SendAsync("SendMeasseNotifayMe", "Message has been Sent",  messageResult.messageID, messageResult.message, messageResult.chatId, messageResult.senderID, messageResult.date);
     this.hubConnection.on('SendMeasseNotifayMe', (message: any) => {
       //push this param to chat-->messages 
-      debugger
       this.messages.push({ username: 'opponant', text: message, isCurrentUser: true });
+    });
+    /////////////////////////////////////////
+    this.hubConnection.on('BroadcastWinner', (winnerName : any, currentPlayerId : any, opponentId: any) => {
+     this.tictactoe.gameWinners(winnerName)     
     });
   }
   ngOnInit() {
@@ -146,6 +150,14 @@ export class SignalrService {
   sendReqForGame(ToUserId: any) {
     this.hubConnection.invoke('CreateGameBoard', this.userId, this.userName, ToUserId)
   }
+  async broadcastWinner(winnerName: string, currentPlayerId: string, opponentId: string): Promise<void> {
+    this.hubConnection.invoke('BroadcastWinner', winnerName, currentPlayerId, opponentId)
+      .catch((error) => {
+        console.error('Error broadcasting winner:', error);
+      });
+  }
+
+
 
   AcceptOrReject(GameId: any, Status: boolean) {
     this.hubConnection.invoke('AcceptOrReject', GameId, Status)
