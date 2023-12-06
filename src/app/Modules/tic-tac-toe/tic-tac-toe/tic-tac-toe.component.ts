@@ -66,15 +66,12 @@ export class TicTacToeComponent {
   }
 
   ngOnInit() {
-    // Retrieve stored data from sessionStorage
     const myDataString = sessionStorage.getItem('myData');
     const opponentDataString = sessionStorage.getItem('OpponentData');
   
-    // Parse and assign values directly
     this.userInfo = JSON.parse(myDataString || '{}');
     this.opponentInfo = JSON.parse(opponentDataString || '{}');
   
-    // Set player names
     this.player1.name = this.userInfo.myName;
     this.player2.name = this.opponentInfo.Opponentname;
   
